@@ -84,11 +84,10 @@ function! s:choose_repository(fakepath)
   return ['browse', result]
 endfunction
 
-function! s:browse_directory(fakepath)
+function! s:browse_directory(fakepath, rawpath)
   call s:log(['  dir' . a:fakepath])
-  let raw = s:rawpath(a:fakepath)
   let result = []
-  let list = systemlist('svn ls ' . raw)
+  let list = systemlist('svn ls ' . a:rawpath)
 
   call add(result, {
         \    'label': '..',
@@ -123,7 +122,7 @@ function! metarw#svn#read(fakepath)
   if s:isroot(raw)
     return s:choose_repository(a:fakepath)
   elseif s:isdir(raw)
-    return s:browse_directory(a:fakepath)
+    return s:browse_directory(a:fakepath, raw)
   else
     return s:read_content(a:fakepath)
   endif
