@@ -68,7 +68,7 @@ function! s:isdir_not_used(path)
 endfunction
 
 function! s:log(list)
-  "call writefile(a:list, s:debug_log_path, 'a')
+  call writefile(a:list, s:debug_log_path, 'a')
 endfunction
 
 function! s:choose_repository(fakepath)
@@ -106,13 +106,10 @@ endfunction
 
 function! s:read_content(fakepath)
   let raw = s:rawpath(a:fakepath)
-  let dest = '/tmp/' . s:basename(raw)
-  call s:log(['  raw(file)' . raw . ' -> ' . dest])
-  call system('svn export ' . raw . ' ' . dest)
-  return ['read', dest]
-
-  "let content = system('svn cat ' . a:child)
-  "return ['read', 'svn cat ' . a:child]
+  call s:log(['  raw(file)' . raw])
+  let content = system('svn cat ' . raw)
+  call setline(2, split(iconv(content, 'utf-8', &encoding), "\n"))
+  return ['done', content]
 endfunction
 
 
@@ -122,8 +119,6 @@ endfunction
 
 function! metarw#svn#read(fakepath)
   call s:log(['read ' . a:fakepath])
-  let raw = s:rawpath(a:fakepath)
-
   if s:isroot(a:fakepath)
     return s:choose_repository(a:fakepath)
   elseif s:isdir(a:fakepath)
