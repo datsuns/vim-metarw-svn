@@ -103,10 +103,9 @@ function! s:browse_directory(fakepath, rawpath)
   return ['browse', result]
 endfunction
 
-function! s:read_content(fakepath)
-  let raw = s:rawpath(a:fakepath)
-  call s:log(['  raw(file)' . raw])
-  let content = system('svn cat ' . raw)
+function! s:read_content(fakepath, rawpath)
+  call s:log(['  raw(file)' . a:rawpath])
+  let content = system('svn cat ' . a:rawpath)
   call setline(2, split(iconv(content, 'utf-8', &encoding), "\n"))
   return ['done', content]
 endfunction
@@ -124,7 +123,7 @@ function! metarw#svn#read(fakepath)
   elseif s:isdir(raw)
     return s:browse_directory(a:fakepath, raw)
   else
-    return s:read_content(a:fakepath)
+    return s:read_content(a:fakepath, raw)
   endif
 endfunction
 
