@@ -68,7 +68,7 @@ function! s:isdir_not_used(path)
 endfunction
 
 function! s:log(list)
-  call writefile(a:list, s:debug_log_path, 'a')
+  "call writefile(a:list, s:debug_log_path, 'a')
 endfunction
 
 function! s:choose_repository(fakepath)
