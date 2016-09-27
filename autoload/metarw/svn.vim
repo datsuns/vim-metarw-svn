@@ -1,5 +1,9 @@
 let s:debug_log_path = 'svn.log'
 
+function! s:log(list)
+  call writefile(a:list, s:debug_log_path, 'a')
+endfunction
+
 function! s:rawpath(path)
   "remove the top of 'svn:'
   if a:path[0:4] == 'svn:/'
@@ -31,7 +35,7 @@ function! s:append(parent, child)
   endif
 endfunction
 
-function! s:up(path)
+function! s:uppath(path)
   let param = split(a:path, '/')
   return join(param[0 : -2], '/')
 endfunction
@@ -42,7 +46,7 @@ function! s:basename(path)
 endfunction
 
 function! s:isroot(path)
-  return s:rawpath(a:path) == ''
+  return a:path == ''
 endfunction
 
 function! s:isdir(path)
@@ -67,10 +71,6 @@ function! s:isdir_not_used(path)
   endif
 endfunction
 
-function! s:log(list)
-  "call writefile(a:list, s:debug_log_path, 'a')
-endfunction
-
 function! s:choose_repository(fakepath)
   call s:log(["choose: " . a:fakepath])
   let result = []
@@ -92,7 +92,7 @@ function! s:browse_directory(fakepath)
 
   call add(result, {
         \    'label': '..',
-        \    'fakepath': s:up(a:fakepath)
+        \    'fakepath': s:uppath(a:fakepath)
         \ })
 
   for e in list
@@ -119,9 +119,10 @@ endfunction
 
 function! metarw#svn#read(fakepath)
   call s:log(['read ' . a:fakepath])
-  if s:isroot(a:fakepath)
+  let raw = s:rawpath(a:fakepath)
+  if s:isroot(raw)
     return s:choose_repository(a:fakepath)
-  elseif s:isdir(a:fakepath)
+  elseif s:isdir(raw)
     return s:browse_directory(a:fakepath)
   else
     return s:read_content(a:fakepath)
