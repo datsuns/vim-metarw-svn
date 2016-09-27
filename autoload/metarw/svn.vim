@@ -35,9 +35,9 @@ function! s:append(parent, child)
   endif
 endfunction
 
-function! s:uppath(path)
+function! s:parentdir(path)
   let param = split(a:path, '/')
-  return join(param[0 : -2], '/')
+  return join(param[0 : -2], '/') . '/'
 endfunction
 
 function! s:basename(path)
@@ -85,13 +85,13 @@ function! s:choose_repository(fakepath)
 endfunction
 
 function! s:browse_directory(fakepath, rawpath)
-  call s:log(['  dir' . a:fakepath])
+  call s:log(['  dir ' . a:fakepath . ' (' . a:rawpath . ')'])
   let result = []
   let list = systemlist('svn ls ' . a:rawpath)
 
   call add(result, {
         \    'label': '..',
-        \    'fakepath': s:uppath(a:fakepath)
+        \    'fakepath': s:parentdir(a:fakepath)
         \ })
 
   for e in list
@@ -104,7 +104,7 @@ function! s:browse_directory(fakepath, rawpath)
 endfunction
 
 function! s:read_content(fakepath, rawpath)
-  call s:log(['  raw(file)' . a:rawpath])
+  call s:log(['  raw(file) ' . a:rawpath])
   let content = system('svn cat ' . a:rawpath)
   call setline(2, split(iconv(content, 'utf-8', &encoding), "\n"))
   return ['done', content]
