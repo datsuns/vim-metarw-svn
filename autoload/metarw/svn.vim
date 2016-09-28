@@ -1,7 +1,7 @@
 let s:debug_log_path = 'svn.log'
 
 function! s:log(list)
-  call writefile(a:list, s:debug_log_path, 'a')
+  "call writefile(a:list, s:debug_log_path, 'a')
 endfunction
 
 function! s:rawpath(path)
