@@ -57,6 +57,10 @@ function! s:isdir(path)
   return result
 endfunction
 
+function! s:sort(i1, i2)
+  return toupper(a:i1) > toupper(a:i2)
+endfunction
+
 " take a long time...
 function! s:isdir_not_used(path)
   let raw = s:rawpath(a:path)
@@ -94,7 +98,7 @@ function! s:browse_directory(fakepath, rawpath)
         \    'fakepath': s:parentdir(a:fakepath)
         \ })
 
-  for e in list
+  for e in sort(list, "s:sort")
     call add(result, {
           \    'label': ' ' . e,
           \    'fakepath': s:to_entry(a:fakepath) . '/' . e
