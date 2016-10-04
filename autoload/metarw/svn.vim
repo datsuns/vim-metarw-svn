@@ -1,7 +1,10 @@
 let s:debug_log_path = 'svn.log'
+let s:enable_local_logging = v:false
 
 function! s:log(list)
-  "call writefile(a:list, s:debug_log_path, 'a')
+  if s:enable_local_logging == v:true
+    call writefile(a:list, s:debug_log_path, 'a')
+endif
 endfunction
 
 function! s:rawpath(path)
@@ -135,3 +138,10 @@ function! metarw#svn#write(fakepath, line1, line2, append_p)
   call s:log(['write'])
 endfunction
 
+function! metarw#svn#enable_logging()
+  let s:enable_local_logging = v:true
+endfunction
+
+function! metarw#svn#disable_logging()
+  let s:enable_local_logging = v:false
+endfunction

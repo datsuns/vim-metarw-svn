@@ -7,3 +7,5 @@
 "nmap <silent> <Plug>(metarw-open-here)
 "  \ :<C-u>call <SID>SvnExplorerOpen()<Return>
 
+command! -nargs=0 SvnExplorerEnableLogging call metarw#svn#enable_logging()
+command! -nargs=0 SvnExplorerDisableLogging call metarw#svn#disable_logging()
