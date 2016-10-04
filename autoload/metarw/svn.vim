@@ -1,5 +1,6 @@
 let s:debug_log_path = 'svn.log'
 let s:enable_local_logging = v:false
+let s:iconv_encoding = 'utf-8'
 
 function! s:log(list)
   if s:enable_local_logging == v:true
@@ -113,7 +114,8 @@ endfunction
 function! s:read_content(fakepath, rawpath)
   call s:log(['  raw(file) ' . a:rawpath])
   let content = system('svn cat ' . a:rawpath)
-  call setline(2, split(iconv(content, 'utf-8', &encoding), "\n"))
+  call setline(2, split(iconv(content, s:iconv_encoding, &encoding), "\n"))
+  "call setline(2, split(iconv(content, 'cp932', &encoding), "\n"))
   return ['done', content]
 endfunction
 
@@ -145,3 +147,8 @@ endfunction
 function! metarw#svn#disable_logging()
   let s:enable_local_logging = v:false
 endfunction
+
+function! metarw#svn#switch_encoding(enc)
+  let s:iconv_encoding = a:enc
+endfunction
+

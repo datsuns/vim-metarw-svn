@@ -9,3 +9,4 @@
 
 command! -nargs=0 SvnExplorerEnableLogging call metarw#svn#enable_logging()
 command! -nargs=0 SvnExplorerDisableLogging call metarw#svn#disable_logging()
+command! -nargs=0 SvnExplorerSwitchEncoding call metarw#svn#switch_encoding('cp932')
