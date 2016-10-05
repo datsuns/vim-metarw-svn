@@ -115,7 +115,6 @@ function! s:read_content(fakepath, rawpath)
   call s:log(['  raw(file) ' . a:rawpath])
   let content = system('svn cat ' . a:rawpath)
   call setline(2, split(iconv(content, s:iconv_encoding, &encoding), "\n"))
-  "call setline(2, split(iconv(content, 'cp932', &encoding), "\n"))
   return ['done', content]
 endfunction
 
@@ -150,5 +149,14 @@ endfunction
 
 function! metarw#svn#switch_encoding(enc)
   let s:iconv_encoding = a:enc
+endfunction
+
+function! metarw#svn#show_log(fakepath)
+  let raw = s:rawpath(a:fakepath)
+  "let content = system('svn log -l 50 ' . raw)
+  tabnew
+  "call setline(2, split(iconv(content, s:iconv_encoding, &encoding), "\n"))
+  "setlocal readonly nomodified
+  execute ":SVNLog " . raw
 endfunction
 
