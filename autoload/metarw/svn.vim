@@ -153,10 +153,10 @@ endfunction
 
 function! metarw#svn#show_log(fakepath)
   let raw = s:rawpath(a:fakepath)
-  "let content = system('svn log -l 50 ' . raw)
+  let content = system('svn log -l 10 ' . raw)
   tabnew
-  "call setline(2, split(iconv(content, s:iconv_encoding, &encoding), "\n"))
-  "setlocal readonly nomodified
-  execute ":SVNLog " . raw
+  call setline(2, split(iconv(content, s:iconv_encoding, &encoding), "\n"))
+  setlocal readonly nomodified foldmethod=syntax ft=log
+  "execute ":SVNLog " . raw
 endfunction
 
