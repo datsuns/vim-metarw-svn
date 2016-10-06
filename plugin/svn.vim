@@ -11,5 +11,7 @@ command! -nargs=0 SvnExplorerEnableLogging call metarw#svn#enable_logging()
 command! -nargs=0 SvnExplorerDisableLogging call metarw#svn#disable_logging()
 command! -nargs=0 SvnExplorerSwitchEncoding call metarw#svn#switch_encoding('cp932')
 command! -nargs=0 SvnExplorerShowLog call metarw#svn#show_log(buffer_name("%"))
+command! -nargs=0 SvnExplorerShowDiff call metarw#svn#show_diff()
 nmap <Space>sl :SvnExplorerShowLog<CR>
+nmap <Space>sd :SvnExplorerShowDiff<CR>
 

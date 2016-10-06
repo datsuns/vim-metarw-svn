@@ -1,3 +1,8 @@
+"
+" TODO
+"   [ ]log中のファイル名によるdiff表示
+"   [ ]log中にあるURLをbrowserで開く
+
 let s:debug_log_path = 'svn.log'
 let s:enable_local_logging = v:false
 let s:iconv_encoding = 'utf-8'
@@ -118,6 +123,37 @@ function! s:read_content(fakepath, rawpath)
   return ['done', content]
 endfunction
 
+function! s:get_revision(start_lnum)
+  let s = a:start_lnum
+  while s > 0
+    let now = getline(s)
+    if now =~ "^r[0-9]\\+ "
+      break
+    endif
+    let s = s - 1
+  endwhile
+  if s == 0
+    return [v:false, ""]
+  endif
+  let rev = split(now, " ")[0]
+  return [v:true, substitute(rev, "r", "", "g")]
+endfunction
+
+function! s:get_updated_fname_url()
+  let fname_line = getline(line("."))
+  let fname_raw = substitute(fname_line, "^ \\+\[M|A|D\] ", "", "g")
+  let fname_full = g:metaraw_svn_repository_root . fname_raw
+  return fname_full
+endfunction
+
+function! s:build_diff_cmd(revision)
+  let current = a:revision
+  let prev = current - "1"
+  let fname_line = getline(line("."))
+  let fname_raw = substitute(fname_line, "^ \\+\[M|A|D\] ", "", "g")
+  let fname_full = g:metaraw_svn_repository_root . fname_raw
+  return "svn --diff-cmd \"diff\" --extensions \"-y\" diff -r" . prev . ":" . current . " " . fname_full
+endfunction
 
 function! metarw#svn#complete(arglead, cmdline, cursorpos)
   call s:log(['complete'])
@@ -153,10 +189,43 @@ endfunction
 
 function! metarw#svn#show_log(fakepath)
   let raw = s:rawpath(a:fakepath)
-  let content = system('svn log -l 10 ' . raw)
+  let content = system('svn log --verbose -l 10 ' . raw)
   tabnew
+  call setline(1, "log for " . raw)
   call setline(2, split(iconv(content, s:iconv_encoding, &encoding), "\n"))
-  setlocal readonly nomodified foldmethod=syntax ft=log
+  setlocal readonly nomodified
+  setlocal foldmethod=marker foldtext=metarw#svn#foldtext() foldcolumn=3
+  execute ":f svnlog"
   "execute ":SVNLog " . raw
+endfunction
+
+function! metarw#svn#show_diff()
+  let ret = s:get_revision(line("."))
+  if ret[0] == v:false
+    echo "NOT FOUND"
+    return
+  endif
+  let url = s:get_updated_fname_url()
+  let current = ret[1]
+  let prev = current - "1"
+
+  tabnew
+  let left = system("svn cat -r " . current . " " . url)
+  execute ":f " . url
+  call setline(1, split(left, "\n"))
+  setlocal readonly nomodified
+  execute ":f " . current
+  execute ":diffthis"
+  execute ":vnew"
+  let right = system("svn cat -r " . prev . " " . url)
+  execute ":f " . url
+  call setline(1, split(right, "\n"))
+  setlocal readonly nomodified
+  execute ":f " . prev
+  execute ":diffthis"
+endfunction
+
+function! metarw#svn#foldtext()
+  echo v:foldstart
 endfunction
 
