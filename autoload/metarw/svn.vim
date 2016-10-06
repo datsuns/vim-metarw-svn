@@ -66,6 +66,14 @@ function! s:isdir(path)
   return result
 endfunction
 
+function! s:fixpath(path)
+  if s:isdir(a:path)
+    return a:path
+  else
+    return a:path . '/'
+  endif
+endfunction
+
 function! s:sort(i1, i2)
   return toupper(a:i1) > toupper(a:i2)
 endfunction
@@ -89,8 +97,8 @@ function! s:choose_repository(fakepath)
   let result = []
   for [k, v] in items(g:metaraw_svn_repository_list)
     call add(result, {
-          \    'label': k . ': ' . v,
-          \    'fakepath': s:append(a:fakepath, v)
+          \    'label': k . ': ' . s:fixpath(v),
+          \    'fakepath': s:append(a:fakepath, s:fixpath(v))
           \ })
     call s:log(["    => " . result[-1]['label'] . ' , ' . result[-1]['fakepath']])
   endfor
