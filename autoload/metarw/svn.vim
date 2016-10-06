@@ -203,6 +203,7 @@ function! metarw#svn#show_log(fakepath)
   call setline(2, split(iconv(content, s:iconv_encoding, &encoding), "\n"))
   setlocal readonly nomodified
   setlocal foldmethod=marker foldtext=metarw#svn#foldtext() foldcolumn=3
+  nnoremap <buffer> q <C-w>c
   execute ":f svnlog"
   "execute ":SVNLog " . raw
 endfunction
