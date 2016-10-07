@@ -6,11 +6,12 @@
 let s:debug_log_path = 'svn.log'
 let s:enable_local_logging = v:false
 let s:iconv_encoding = 'utf-8'
+let s:svn_repository_root = ''
 
 function! s:log(list)
   if s:enable_local_logging == v:true
     call writefile(a:list, s:debug_log_path, 'a')
-endif
+  endif
 endfunction
 
 function! s:rawpath(path)
@@ -150,7 +151,7 @@ endfunction
 function! s:get_updated_fname_url()
   let fname_line = getline(line("."))
   let fname_raw = substitute(fname_line, "^ \\+\[M|A|D\] ", "", "g")
-  let fname_full = g:metaraw_svn_repository_root . fname_raw
+  let fname_full = s:fixpath(s:svn_repository_root) . fname_raw
   return fname_full
 endfunction
 
@@ -163,6 +164,23 @@ function! s:build_diff_cmd(revision)
   return "svn --diff-cmd \"diff\" --extensions \"-y\" diff -r" . prev . ":" . current . " " . fname_full
 endfunction
 
+function! s:fix_repository_root(url)
+  if s:svn_repository_root == ''
+    call s:log(["  ==> URL fix w/ " . a:url])
+    let show = systemlist('svn info ' . a:url)
+    let s:svn_repository_root = substitute(show[1], "^URL: ", "", "")
+  endif
+  call s:log([" URL fixed: [" . s:svn_repository_root . "]"])
+endfunction
+
+function!  s:fix_script_keymap()
+  nmap <Space>sl :SvnExplorerShowLog<CR>
+  nmap <Space>sd :SvnExplorerShowDiff<CR>
+endfunction
+
+" -------------------------------------
+" metarw interfaces
+" -------------------------------------
 function! metarw#svn#complete(arglead, cmdline, cursorpos)
   call s:log(['complete'])
 endfunction
@@ -171,11 +189,15 @@ function! metarw#svn#read(fakepath)
   call s:log(['read ' . a:fakepath])
   let raw = s:rawpath(a:fakepath)
   if s:isroot(raw)
+    call s:fix_script_keymap()
     return s:choose_repository(a:fakepath)
-  elseif s:isdir(raw)
-    return s:browse_directory(a:fakepath, raw)
   else
-    return s:read_content(a:fakepath, raw)
+    call s:fix_repository_root(raw)
+    if s:isdir(raw)
+      return s:browse_directory(a:fakepath, raw)
+    else
+      return s:read_content(a:fakepath, raw)
+    endif
   endif
 endfunction
 
@@ -183,6 +205,10 @@ function! metarw#svn#write(fakepath, line1, line2, append_p)
   call s:log(['write'])
 endfunction
 
+
+" -------------------------------------
+" other interfaces
+" -------------------------------------
 function! metarw#svn#enable_logging()
   let s:enable_local_logging = v:true
 endfunction
