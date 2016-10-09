@@ -251,7 +251,6 @@ function! metarw#svn#show_log(fakepath)
   setlocal foldmethod=marker foldtext=metarw#svn#foldtext() foldcolumn=3
   nnoremap <buffer> q <C-w>c
   execute ":f svnlog"
-  "execute ":SVNLog " . raw
 endfunction
 
 function! metarw#svn#show_diff()
