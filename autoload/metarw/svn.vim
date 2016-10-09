@@ -148,6 +148,8 @@ function! s:get_revision(start_lnum)
   return [v:true, substitute(rev, "r", "", "g")]
 endfunction
 
+" TODO
+"   [ ]見つからんかった場合の判定
 function! s:get_updated_fname_url()
   let fname_line = getline(line("."))
   let fname_raw = substitute(fname_line, "^ \\+\[M|A|D\] ", "", "g")
@@ -155,6 +157,7 @@ function! s:get_updated_fname_url()
   return fname_full
 endfunction
 
+" 結局:diffthis使う方が良さそう
 function! s:build_diff_cmd(revision)
   let current = a:revision
   let prev = current - "1"
@@ -162,6 +165,22 @@ function! s:build_diff_cmd(revision)
   let fname_raw = substitute(fname_line, "^ \\+\[M|A|D\] ", "", "g")
   let fname_full = g:metaraw_svn_repository_root . fname_raw
   return "svn --diff-cmd \"diff\" --extensions \"-y\" diff -r" . prev . ":" . current . " " . fname_full
+endfunction
+
+function!  s:load_diff_content(url, rev)
+  let body = system("svn cat -r " . a:rev . " " . a:url)
+  execute ":f " . a:url
+  call setline(1, split(body , "\n"))
+  setlocal readonly nomodified
+  nnoremap <buffer> q <C-w>c
+  execute ":f " . a:rev
+  execute ":diffthis"
+endfunction
+
+function!  s:build_diff_view(url, rev_current, rev_prev)
+  call s:load_diff_content(a:url, a:rev_current)
+  execute ":vnew"
+  call s:load_diff_content(a:url, a:rev_prev )
 endfunction
 
 function! s:fix_repository_root(url)
@@ -228,6 +247,7 @@ function! metarw#svn#show_log(fakepath)
   call setline(1, "log for " . raw)
   call setline(2, split(iconv(content, s:iconv_encoding, &encoding), "\n"))
   setlocal readonly nomodified
+  setlocal filetype=svnlog
   setlocal foldmethod=marker foldtext=metarw#svn#foldtext() foldcolumn=3
   nnoremap <buffer> q <C-w>c
   execute ":f svnlog"
@@ -240,24 +260,12 @@ function! metarw#svn#show_diff()
     echo "NOT FOUND"
     return
   endif
+
   let url = s:get_updated_fname_url()
   let current = ret[1]
   let prev = current - "1"
-
   tabnew
-  let left = system("svn cat -r " . current . " " . url)
-  execute ":f " . url
-  call setline(1, split(left, "\n"))
-  setlocal readonly nomodified
-  execute ":f " . current
-  execute ":diffthis"
-  execute ":vnew"
-  let right = system("svn cat -r " . prev . " " . url)
-  execute ":f " . url
-  call setline(1, split(right, "\n"))
-  setlocal readonly nomodified
-  execute ":f " . prev
-  execute ":diffthis"
+  call s:build_diff_view(url, current, prev)
 endfunction
 
 function! metarw#svn#foldtext()
