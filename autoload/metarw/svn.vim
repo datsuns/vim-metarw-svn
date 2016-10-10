@@ -238,6 +238,22 @@ function! metarw#svn#show_log(fakepath)
   execute ":f svnlog"
 endfunction
 
+function! metarw#svn#show_blame(fakepath, selected)
+  let raw = s:rawpath(a:fakepath)
+  let target = raw
+  if s:isdir(raw)
+    let target = raw . a:selected
+  endif
+  call s:log(["blame! : " . target])
+  tabnew
+  let content = system('svn blame ' . target)
+  call setline(1, split(iconv(content, s:iconv_encoding, &encoding), "\n"))
+  setlocal readonly nomodified
+  setlocal filetype=svnlog
+  nnoremap <buffer> q <C-w>c
+  execute ":f blame:" . target
+endfunction
+
 function! metarw#svn#show_diff()
   let ret = s:get_revision(line("."))
   if ret[0] == v:false
