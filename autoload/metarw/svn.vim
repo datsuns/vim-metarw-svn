@@ -79,20 +79,6 @@ function! s:sort(i1, i2)
   return toupper(a:i1) > toupper(a:i2)
 endfunction
 
-" take a long time...
-function! s:isdir_not_used(path)
-  let raw = s:rawpath(a:path)
-  call s:log([' directory ? ' . raw])
-  let kind = systemlist('svn info --show-item kind ' . raw)
-  if kind[0] == 'dir'
-    call s:log(['   -> yes'])
-    return v:true
-  else
-    call s:log(['   -> no'])
-    return v:false
-  endif
-endfunction
-
 function! s:choose_repository(fakepath)
   call s:log(["choose: " . a:fakepath])
   let result = []
