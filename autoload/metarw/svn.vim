@@ -154,12 +154,11 @@ function! s:build_diff_cmd(revision)
 endfunction
 
 function!  s:load_diff_content(url, rev)
-  let body = system("svn cat -r " . a:rev . " " . a:url)
-  execute ":f " . a:url
-  call setline(1, split(body , "\n"))
+  let body = systemlist("svn cat -r " . a:rev . " " . a:url)
+  call setline(1, body)
   setlocal readonly nomodified
   nnoremap <buffer> q <C-w>c
-  execute ":f " . a:rev
+  execute ":f rev." . a:rev
   execute ":diffthis"
 endfunction
 
