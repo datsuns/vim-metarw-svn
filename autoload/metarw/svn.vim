@@ -267,7 +267,3 @@ function! metarw#svn#show_diff()
   call s:build_diff_view(url, current, prev)
 endfunction
 
-function! metarw#svn#foldtext()
-  echo v:foldstart
-endfunction
-
