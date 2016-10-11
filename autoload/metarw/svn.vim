@@ -67,6 +67,14 @@ function! s:isdir(path)
   return result
 endfunction
 
+function! s:trim_pathsep(path)
+  if s:isdir(a:path)
+    return substitute(a:path, /\/$/,  "")
+  else
+    return a:path
+  endif
+endfunction
+
 function! s:fixpath(path)
   if s:isdir(a:path)
     return a:path
@@ -139,7 +147,7 @@ endfunction
 function! s:get_updated_fname_url()
   let fname_line = getline(line("."))
   let fname_raw = substitute(fname_line, "^ \\+\[M|A|D\] ", "", "g")
-  let fname_full = s:fixpath(s:svn_repository_root) . fname_raw
+  let fname_full = s:trim_pathsep(s:svn_repository_root) . fname_raw
   return fname_full
 endfunction
 
@@ -172,7 +180,7 @@ function! s:fix_repository_root(url)
   if s:svn_repository_root == ''
     call s:log(["  ==> URL fix w/ " . a:url])
     let show = systemlist('svn info ' . a:url)
-    let s:svn_repository_root = substitute(show[1], "^URL: ", "", "")
+    let s:svn_repository_root = substitute(show[3], "^.*: ", "", "")
   endif
   call s:log([" URL fixed: [" . s:svn_repository_root . "]"])
 endfunction
@@ -264,6 +272,7 @@ function! metarw#svn#show_diff()
   let url = s:get_updated_fname_url()
   let current = ret[1]
   let prev = current - "1"
+  call s:log(["set diff. url:" . url . " rev:" . prev . ":" . current])
   tabnew
   call s:build_diff_view(url, current, prev)
 endfunction
