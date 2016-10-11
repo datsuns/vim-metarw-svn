@@ -1,0 +1,55 @@
+*svn.txt*	svn repository browser base on vim-metarw
+
+Version 0.0.0
+
+CONTENTS					*metarw-svn-contents*
+
+Introduction		|metarw-svn-introduction|
+Installation		|metarw-svn-installation|
+  Configuration		|metarw-svn-configuration|
+Interface		|metarw-svn-interface|
+  Commands		  |metarw-svn-commands|
+  Functions		  |metarw-svn-functions|
+  Key Mappings		  |metarw-svn-key-mappings|
+
+==============================================================================
+INTRODUCTION					*metarw-svn-introduction*
+
+==============================================================================
+INSTALLATION					*metarw-svn-installation*
+
+dependencies and how to install:
+- vim-metarw
+    NeoBundle 'kana/vim-metarw'
+
+==============================================================================
+CONFIGURATION					*metarw-svn-configuration*
+
+g:metaraw_svn_repository_root
+        set root path to browse
+        example:
+                let g:metaraw_svn_repository_root = "http://path/to/svn/repo"
+
+g:metaraw_svn_repository_list
+        set {label:path} list to browse
+        example:
+                let g:metaraw_svn_repository_list = {
+                      \  'label': 'http://path/to/repository/',
+                      \ 'label2': 'http://othre/srver/path/to/repository/',
+                      \}
+
+==============================================================================
+INTERFACE					*metarw-svn-interface*
+
+==============================================================================
+COMMANDS					*metarw-svn-commands*
+
+==============================================================================
+FUNCTIONS					*metarw-svn-functions*
+
+==============================================================================
+KEY MAPPINGS					*metarw-svn-key-mappings*
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:fen:fdl=0:fdm=marker:
+
