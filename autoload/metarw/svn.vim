@@ -188,6 +188,7 @@ endfunction
 function!  s:fix_script_keymap()
   nmap <Space>sl :SvnExplorerShowLog<CR>
   nmap <Space>sd :SvnExplorerShowDiff<CR>
+  nmap <Space>sb :SvnExplorerShowBlame<CR>
 endfunction
 
 " -------------------------------------
